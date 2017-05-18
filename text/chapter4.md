@@ -139,7 +139,7 @@ This type says that we can choose any two types, `a` and `b`, with which to appl
 ["1","2","3","4","5"]
 ```
 
-Even though the infix operator `<$>` looks like special syntax, it is in fact just an alias for a regular PureScript function. The function is simply _applied_ using infix syntax. In fact, the function can be used like a regular function by enclosing its name in parentheses. This means that we can used the parenthesized name `(<$>)` in place of `map` on arrays:
+Even though the infix operator `<$>` looks like special syntax, it is in fact just an alias for a regular PureScript function. The function is simply _applied_ using infix syntax. In fact, the function can be used like a regular function by enclosing its name in parentheses. This means that we can use the parenthesized name `(<$>)` in place of `map` on arrays:
 
 ```text
 > (<$>) show [1, 2, 3, 4, 5]
@@ -239,7 +239,7 @@ The first step is to generate an array of pairs of numbers below `n`, which we c
 Let's start by mapping each number to the array `1 .. n`:
 
 ```text
-> let pairs n = concatMap (\i -> 1 .. n) (1 .. n)
+> pairs n = concatMap (\i -> 1 .. n) (1 .. n)
 ```
 
 We can test our function
@@ -253,10 +253,10 @@ This is not quite what we want. Instead of just returning the second element of 
 
 ```text
 > :paste
-… let pairs' n =
-…       concatMap (\i ->
-…         map (\j -> [i, j]) (1 .. n)
-…       ) (1 .. n)
+… pairs' n =
+…   concatMap (\i ->
+…     map (\j -> [i, j]) (1 .. n)
+…   ) (1 .. n)
 … ^D
 
 > pairs' 3
@@ -267,10 +267,10 @@ This is looking better. However, we are generating too many pairs: we keep both 
 
 ```text
 > :paste
-… let pairs'' n =
-…       concatMap (\i ->
-…         map (\j -> [i, j]) (i .. n)
-…       ) (1 .. n)
+… pairs'' n =
+…   concatMap (\i ->
+…     map (\j -> [i, j]) (i .. n)
+…   ) (1 .. n)
 … ^D
 > pairs'' 3
 [[1,1],[1,2],[1,3],[2,2],[2,3],[3,3]]
@@ -281,7 +281,7 @@ Great! Now that we have all of the pairs of potential factors, we can use `filte
 ```text
 > import Data.Foldable
 
-> let factors n = filter (\pair -> product pair == n) (pairs'' n)
+> factors n = filter (\pair -> product pair == n) (pairs'' n)
 
 > factors 10
 [[1,10],[2,5]]
@@ -460,13 +460,13 @@ Recursion is a powerful technique for specifying algorithms, but comes with a pr
 It is easy to verify this problem, with the following code in PSCi:
 
 ```text
-> let f 0 = 0
-      f n = 1 + f (n - 1)
+> f 0 = 0
+  f n = 1 + f (n - 1)
 
 > f 10
 10
 
-> f 10000
+> f 100000
 RangeError: Maximum call stack size exceeded
 ```
 
@@ -530,8 +530,8 @@ For example, the `reverse` example can be written as a fold in at least two ways
 > import Data.Foldable
 
 > :paste
-… let reverse :: forall a. Array a -> Array a
-…     reverse = foldr (\x xs -> xs <> [x]) []
+… reverse :: forall a. Array a -> Array a
+… reverse = foldr (\x xs -> xs <> [x]) []
 … ^D
 
 > reverse [1, 2, 3]
@@ -549,6 +549,7 @@ X>
 X>     ```haskell
 X>     import Prelude
 X>     import Data.Array.Partial (head, tail)
+X>     import Partial.Unsafe (unsafePartial)
 X>     
 X>     count :: forall a. (a -> Boolean) -> Array a -> Int
 X>     count _ [] = 0
