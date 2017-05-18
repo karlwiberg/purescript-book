@@ -198,7 +198,7 @@ y + z
 
 In the second case, the PureScript compiler will try to parse _two_ declarations, one for each line.
 
-Generally, any declarations defined in the same block should be indented at the same level. For example, in PSCi, declarations in a let statement must be indented equally. This is valid:
+Generally, any declarations defined in the same block should be indented at the same level. For example, in PSCi, declarations must be indented equally. This is valid:
 
 ```text
 > :paste
@@ -272,7 +272,7 @@ If we try to incorrectly define a value of type `List` (by using the type annota
 ```text
 > import Data.List
 > Nil :: List
-In a type-annotated expression x :: t, the type t must have kind Type
+In a type-annotated expression x :: t, the type t must have kind Type.
 ```
 
 This is a _kind error_. Just like values are distinguished by their _types_, types are distinguished by their _kinds_, and just like ill-typed values result in _type errors_, _ill-kinded_ types result in _kind errors_.
@@ -342,7 +342,7 @@ $ pulp psci
 > import Data.AddressBook
 ```
 
-We can create an entry by using a record literal, which looks just like an anonymous object in JavaScript. Bind it to a name with a `let` expression:
+We can create an entry by using a record literal, which looks just like an anonymous object in JavaScript, and bind it to a name with `=`:
 
 ```text
 > address = { street: "123 Fake St.", city: "Faketown", state: "CA" }
@@ -392,10 +392,10 @@ $ pulp psci
 > import Data.List
 > :type Cons
 
-forall a. a -> List a -> List a
+forall t1. t1 -> List t1 -> List t1
 ```
 
-This type signature says that `Cons` takes a value of some type `a`, and a list of elements of type `a`, and returns a new list with entries of the same type. Let's specialize this with `a` as our `Entry` type:
+This type signature says that `Cons` takes a value of some type `t1`, and a list of elements of type `t1`, and returns a new list with entries of the same type. Let's specialize this with `t1` as our `Entry` type:
 
 ```haskell
 Entry -> List Entry -> List Entry

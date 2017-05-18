@@ -139,7 +139,7 @@ This type says that we can choose any two types, `a` and `b`, with which to appl
 ["1","2","3","4","5"]
 ```
 
-Even though the infix operator `<$>` looks like special syntax, it is in fact just an alias for a regular PureScript function. The function is simply _applied_ using infix syntax. In fact, the function can be used like a regular function by enclosing its name in parentheses. This means that we can used the parenthesized name `(<$>)` in place of `map` on arrays:
+Even though the infix operator `<$>` looks like special syntax, it is in fact just an alias for a regular PureScript function. The function is simply _applied_ using infix syntax. In fact, the function can be used like a regular function by enclosing its name in parentheses. This means that we can use the parenthesized name `(<$>)` in place of `map` on arrays:
 
 ```text
 > (<$>) show [1, 2, 3, 4, 5]
@@ -549,6 +549,7 @@ X>
 X>     ```haskell
 X>     import Prelude
 X>     import Data.Array.Partial (head, tail)
+X>     import Partial.Unsafe (unsafePartial)
 X>     
 X>     count :: forall a. (a -> Boolean) -> Array a -> Int
 X>     count _ [] = 0
