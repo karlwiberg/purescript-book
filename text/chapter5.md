@@ -253,6 +253,7 @@ Here is an example. This function computes "longest zero suffix" of an array (th
 
 ```haskell
 import Data.Array.Partial (tail)
+import Data.Foldable (sum)
 import Partial.Unsafe (unsafePartial)
 
 lzs :: Array Int -> Array Int

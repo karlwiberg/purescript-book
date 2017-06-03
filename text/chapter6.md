@@ -10,7 +10,7 @@ We will also see a collection of standard type classes from PureScript's Prelude
 
 ## Project Setup
 
-The source code for this chapter is defined in the file `src/Data/Hashable.purs`. 
+The source code for this chapter is defined in the file `src/Data/Hashable.purs`.
 
 The project has the following Bower dependencies:
 
@@ -231,7 +231,7 @@ class Foldable f where
   foldMap :: forall a m. Monoid m => (a -> m) -> f a -> m
 ```
 
-It is instructive to specialize to the case where `f` is the array type constructor. In this case, we can replace `f a` with `Array a` for any a, and we notice that the types of `foldl` and `foldr` become the types that we saw when we first encountered folds over arrays.
+It is instructive to specialize to the case where `f` is the array type constructor. In this case, we can replace `f a` with `Array a` for any `a`, and we notice that the types of `foldl` and `foldr` become the types that we saw when we first encountered folds over arrays.
 
 What about `foldMap`? Well, that becomes `forall a m. Monoid m => (a -> m) -> Array a -> m`. This type signature says that we can choose any type `m` for our result type, as long as that type is an instance of the `Monoid` type class. If we can provide a function which turns our array elements into values in that monoid, then we can accumulate over our array using the structure of the monoid, and return a single value.
 
@@ -369,7 +369,7 @@ instance showT2 :: Show T where
 This module will compile with no warnings. However, if we _use_ `show` at type `T` (requiring the compiler to to find a `Show` instance), the overlapping instances rule will be enforced, resulting in a warning:
 
 ```text
-Overlapping instances found for Prelude.Show T
+Overlapping instances found for Data.Show.Show T
 ```
 
 The overlapping instances rule is enforced so that automatic selection of type class instances is a predictable process. If we allowed two type class instances for a type to exist, then either could be chosen depending on the order of module imports, and that could lead to unpredictable behavior of the program at runtime, which is undesirable.
@@ -418,13 +418,13 @@ X>     ```
 X>         
 X>     Write an `Ord` instance for `Extended a` which reuses the `Ord` instance for `a`.
 X> 1. (Difficult) Write a `Foldable` instance for `NonEmpty`. _Hint_: reuse the `Foldable` instance for arrays.
-X> 1. (Difficult) Given an type constructor `f` which defines an ordered container (and so has a `Foldable` instance), we can create a new container type which includes an extra element at the front:
+X> 1. (Difficult) Given a type constructor `f` which defines an ordered container (and so has a `Foldable` instance), we can create a new container type which includes an extra element at the front:
 X>
 X>     ```haskell
 X>     data OneMore f a = OneMore a (f a)
 X>     ```
 X>         
-X>     The container `OneMore f` is also has an ordering, where the new element comes before any element of `f`. Write a `Foldable` instance for `OneMore f`:
+X>     The container `OneMore f` also has an ordering, where the new element comes before any element of `f`. Write a `Foldable` instance for `OneMore f`:
 X>   
 X>     ```haskell
 X>     instance foldableOneMore :: Foldable f => Foldable (OneMore f) where
@@ -441,7 +441,7 @@ Let's see an example of a type class with two type arguments.
 module Stream where
 
 import Data.Array as Array
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Data.String as String
 
 class Stream stream element where

@@ -226,6 +226,8 @@ This is good, because now we can send an error response back from our web servic
 Instead of lifting over `Maybe`, we can lift over `Either String`, which allows us to return an error message. First, let's write an operator to convert optional inputs into computations which can signal an error using `Either String`:
 
 ```text
+> import Data.Either
+
 > :paste
 … withError Nothing  err = Left err
 … withError (Just a) _   = Right a
@@ -354,9 +356,9 @@ examplePerson :: Person
 examplePerson =
   person "John" "Smith"
          (address "123 Fake St." "FakeTown" "CA")
-  	     [ phoneNumber HomePhone "555-555-5555"
+         [ phoneNumber HomePhone "555-555-5555"
          , phoneNumber CellPhone "555-555-0000"
-  	     ]
+         ]
 ```
 
 Test this value in PSCi (this result has been formatted):
@@ -426,7 +428,7 @@ nonEmpty :: String -> String -> V Errors Unit
 nonEmpty field "" = invalid ["Field '" <> field <> "' cannot be empty"]
 nonEmpty _     _  = pure unit
 
-lengthIs :: String -> Number -> String -> V Errors Unit
+lengthIs :: String -> Int -> String -> V Errors Unit
 lengthIs field len value | S.length value /= len =
   invalid ["Field '" <> field <> "' must have length " <> show len]
 lengthIs _     _   _     =
@@ -468,8 +470,8 @@ This time, we receive an array of all validation errors.
 The `validatePhoneNumber` function uses a regular expression to validate the form of its argument. The key is a `matches` validation function, which uses a `Regex` from the `Data.String.Regex` module to validate its input:
 
 ```haskell
-matches :: String -> R.Regex -> String -> V Errors Unit
-matches _     regex value | R.test regex value =
+matches :: String -> Regex -> String -> V Errors Unit
+matches _     regex value | test regex value =
   pure unit
 matches field _     _     =
   invalid ["Field '" <> field <> "' did not match the required format"]
@@ -518,7 +520,7 @@ validatePerson (Person o) =
               pure o.firstName)
          <*> (nonEmpty "Last Name"  o.lastName  *>
               pure o.lastName)
-	       <*> validateAddress o.address
+         <*> validateAddress o.address
          <*> (arrayNonEmpty "Phone Numbers" o.phones *>
               traverse validatePhoneNumber o.phones)
 ```
