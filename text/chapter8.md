@@ -431,7 +431,7 @@ import Control.Monad.Eff.Console (logShow)
 main = do
   n <- random
   logShow n
-```  
+```
 
 If this file is saved as `src/Main.purs`, then it can be compiled and run using Pulp:
 
@@ -509,7 +509,7 @@ Note that we don't have to give a type for `main`. `psc` will find a most genera
 
 ## The Kind of Eff
 
-The type of `main` is unlike other types we've seen before. To explain it, we need to consider the _kind_ of `Eff`. Recall that types are classified by their kinds just like values are classified by their types. So far, we've only seen kinds built from `*` (the kind of types) and `->` (which builds kinds for type constructors).
+The type of `main` is unlike other types we've seen before. To explain it, we need to consider the _kind_ of `Eff`. Recall that types are classified by their kinds just like values are classified by their types. So far, we've only seen kinds built from `Type` (the kind of types) and `->` (which builds kinds for type constructors).
 
 To find the kind of `Eff`, use the `:kind` command in PSCi:
 
@@ -517,22 +517,20 @@ To find the kind of `Eff`, use the `:kind` command in PSCi:
 > import Control.Monad.Eff
 
 > :kind Eff
-# ! -> * -> *
+# Control.Monad.Eff.Effect -> Type -> Type
 ```
 
-There are two symbols here that we have not seen before.
-
-`!` is the kind of _effects_, which represents _type-level labels_ for different types of side-effects. To understand this, note that the two labels we saw in `main` above both have kind `!`:
+`Control.Monad.Eff.Effect` is the kind of _effects_, which represents _type-level labels_ for different types of side-effects. To understand this, note that the two labels we saw in `main` above both have kind `Control.Monad.Eff.Effect`:
 
 ```text
 > import Control.Monad.Eff.Console
 > import Control.Monad.Eff.Random
 
 > :kind CONSOLE
-!
+Control.Monad.Eff.Effect
 
 > :kind RANDOM
-!
+Control.Monad.Eff.Effect
 ```
 
 The `#` kind constructor is used to construct kinds for _rows_, i.e. unordered, labelled sets.
@@ -560,7 +558,7 @@ fullName :: forall r. { firstName :: String, lastName :: String | r } -> String
 fullName person = person.firstName <> " " <> person.lastName
 ```
 
-The kind of the type on the left of the function arrow must be `*`, because only types of kind `*` have values.
+The kind of the type on the left of the function arrow must be `Type`, because only types of kind `Type` have values.
 
 The curly braces are actually syntactic sugar, and the full type as understood by the PureScript compiler is as follows:
 
@@ -572,7 +570,7 @@ Note that the curly braces have been removed, and there is an extra `Record` con
 
 ```text
 > :kind Record
-# * -> *
+# Type -> Type
 ```
 
 That is, `Object` is a type constructor which takes a _row of types_ and constructs a type. This is what allows us to write row-polymorphic functions on records.
@@ -588,17 +586,21 @@ Type annotations are usually not required when using `Eff`, since rows of effect
 If we annotate the previous example with a _closed_ row of effects:
 
 ``` haskell
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (CONSOLE, logShow)
+import Control.Monad.Eff.Random (RANDOM, random)
+
 main :: Eff (console :: CONSOLE, random :: RANDOM) Unit
 main = do
   n <- random
-  print n
+  logShow n
 ```
 
 (note the lack of the row variable `eff` here), then we cannot accidentally include a subcomputation which makes use of a different type of effect. In this way, we can control the side-effects that our code is allowed to have.
 
 ## Handlers and Actions
 
-Functions such as `print` and `random` are called _actions_. Actions have the `Eff` type on the right hand side of their functions, and their purpose is to _introduce_ new effects.
+Functions such as `logShow` and `random` are called _actions_. Actions have the `Eff` type on the right hand side of their functions, and their purpose is to _introduce_ new effects.
 
 This is in contrast to _handlers_, in which the `Eff` type appears as the type of a function argument. While actions _add_ to the set of required effects, a handler usually _subtracts_ effects from the set.
 
@@ -683,7 +685,7 @@ simulate :: forall eff h. Number -> Number -> Int -> Eff (st :: ST h | eff) Numb
 simulate x0 v0 time = do
   ref <- newSTRef { x: x0, v: v0 }
   forE 0 (time * 1000) \_ -> do
-    modifySTRef ref \o ->
+    _ <- modifySTRef ref \o ->
       { v: o.v - 9.81 * 0.001
       , x: o.x + o.v * 0.001
       }
@@ -709,7 +711,7 @@ However, once a reference cell has been created by `newSTRef`, its region type i
 In fact, since `ST` is the only effect in our example, we can use `runST` in conjunction with `runPure` to turn `simulate` into a pure function:
 
 ```haskell
-simulate' :: Number -> Number -> Number -> Number
+simulate' :: Number -> Number -> Int -> Number
 simulate' x0 v0 time = runPure (runST (simulate x0 v0 time))
 ```
 
@@ -718,19 +720,19 @@ You can even try running this function in PSCi:
 ```text
 > import Main
 
-> simulate' 100.0 0.0 0.0
+> simulate' 100.0 0.0 0
 100.00
 
-> simulate' 100.0 0.0 1.0
+> simulate' 100.0 0.0 1
 95.10
 
-> simulate' 100.0 0.0 2.0
+> simulate' 100.0 0.0 2
 80.39
 
-> simulate' 100.0 0.0 3.0
+> simulate' 100.0 0.0 3
 55.87
 
-> simulate' 100.0 0.0 4.0
+> simulate' 100.0 0.0 4
 21.54
 ```
 
@@ -861,7 +863,7 @@ createClass
    . ReactSpec props state eff
   -> ReactClass props
 
-type Render props state eff =
+type Render props state eff
    = ReactThis props state
   -> Eff ( props :: ReactProps
          , refs :: ReactRefs Disallowed

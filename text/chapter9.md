@@ -44,7 +44,7 @@ The graphics context `ctx` manages the state of the canvas, and provides methods
 We continue by setting the fill style to solid blue, by using the `setFillStyle` action:
 
 ```haskell
-  setFillStyle "#0000FF" ctx
+  _ <- setFillStyle "#0000FF" ctx
 ```
 
 Note that the `setFillStyle` action takes the graphics context as an argument. This is a common pattern in the `Graphics.Canvas` module.
@@ -148,12 +148,12 @@ The `translate` function can be used with both the `Rectangle` and `Arc` records
 The third type of path rendered in the `Shapes` example is a piecewise-linear path. Here is the corresponding code:
 
 ```haskell
-  setFillStyle "#FF0000" ctx
+  _ <- setFillStyle "#FF0000" ctx
 
   fillPath ctx $ do
-    moveTo ctx 300.0 260.0
-    lineTo ctx 260.0 340.0
-    lineTo ctx 340.0 340.0
+    _ <- moveTo ctx 300.0 260.0
+    _ <- lineTo ctx 260.0 340.0
+    _ <- lineTo ctx 340.0 340.0
     closePath ctx
 ```
 
@@ -190,7 +190,7 @@ X>     renderPath
 X>       :: forall eff
 X>        . Context2D
 X>       -> Array Point
-X>       -> Eff (canvas :: Canvas | eff) Unit
+X>       -> Eff (canvas :: CANVAS | eff) Unit
 X>     ```
 X>
 X>     Given a function
@@ -210,8 +210,8 @@ The `Example/Random.purs` file contains an example which uses the `Eff` monad to
 The `main` action obtains a reference to the graphics context as before, and then sets the stroke and fill styles:
 
 ```haskell
-  setFillStyle "#FF0000" ctx
-  setStrokeStyle "#000000" ctx
+  _ <- setFillStyle "#FF0000" ctx
+  _ <- setStrokeStyle "#000000" ctx
 ```
 
 Next, the code uses the `for_` function to loop over the integers between `0` and `100`:
@@ -238,7 +238,7 @@ Next, for each circle, the code creates an `Arc` based on these parameters and f
          , start : 0.0
          , end   : Math.pi * 2.0
          }
-    fillPath ctx path
+    _ <- fillPath ctx path
     strokePath ctx path
 ```
 
@@ -360,10 +360,10 @@ The `Control.Monad.Eff.Ref` module provides a type constructor for global mutabl
 > import Control.Monad.Eff.Ref
 
 > :kind Ref
-* -> *
+Type -> Type
 
 > :kind REF
-!
+Control.Monad.Eff.Effect
 ```
 
 A value of type `Ref a` is a mutable reference cell containing a value of type `a`, much like an `STRef h a`, which we saw in the previous chapter. The difference is that, while the `ST` effect can be removed by using `runST`, the `Ref` effect does not provide a handler. Where `ST` is used to track safe, local mutation, `Ref` is used to track global mutation. As such, it should be used sparingly.
@@ -395,10 +395,10 @@ In the `render` function, the click count is used to determine the transformatio
       let scaleX = Math.sin (toNumber count * Math.pi / 4.0) + 1.5
       let scaleY = Math.sin (toNumber count * Math.pi / 6.0) + 1.5
 
-      translate { translateX: 300.0, translateY:  300.0 } ctx
-      rotate (toNumber count * Math.pi / 18.0) ctx
-      scale { scaleX: scaleX, scaleY: scaleY } ctx
-      translate { translateX: -100.0, translateY: -100.0 } ctx
+      _ <- translate { translateX: 300.0, translateY:  300.0 } ctx
+      _ <- rotate (toNumber count * Math.pi / 18.0) ctx
+      _ <- scale { scaleX: scaleX, scaleY: scaleY } ctx
+      _ <- translate { translateX: -100.0, translateY: -100.0 } ctx
 
       fillPath ctx $ rect ctx
         { x: 0.0
@@ -492,7 +492,7 @@ Here is a first approximation to the type of `lsystem`:
 ```haskell
 forall eff. Sentence
          -> (Alphabet -> Sentence)
-         -> (Alphabet -> Eff (canvas :: Canvas | eff) Unit)
+         -> (Alphabet -> Eff (canvas :: CANVAS | eff) Unit)
          -> Int
          -> Eff (canvas :: CANVAS | eff) Unit
 ```
@@ -503,7 +503,7 @@ The third argument represents a function which takes a letter of the alphabet an
 
 The final argument is a number representing the number of iterations of the production rules we would like to perform.
 
-The first observation is that the `lsystem` function should work for only one type of `Alphabet`, but for any type, so we should generalize our type accordingly. Let's replace `Alphabet` and `Sentence` with `a` and `Array a` for some quantified type variable `a`:
+The first observation is that the `lsystem` function should work not for only one type of `Alphabet`, but for any type, so we should generalize our type accordingly. Let's replace `Alphabet` and `Sentence` with `a` and `Array a` for some quantified type variable `a`:
 
 ```haskell
 forall a eff. Array a
@@ -619,8 +619,8 @@ To interpret the letter `F` (move forward), we can calculate the new position of
 interpret state F = do
   let x = state.x + Math.cos state.theta * 1.5
       y = state.y + Math.sin state.theta * 1.5
-  moveTo ctx state.x state.y
-  lineTo ctx x y
+  _ <- moveTo ctx state.x state.y
+  _ <- lineTo ctx x y
   pure { x, y, theta: state.theta }
 ```
 
